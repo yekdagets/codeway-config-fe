@@ -2,10 +2,15 @@ import axios from "axios";
 import { getAuth } from "firebase/auth";
 
 const axiosInstance = axios.create({
-  baseURL: process.env.VUE_APP_API_BASE_URL,
+  baseURL: "http://localhost:3000/api",
 });
 
 axiosInstance.interceptors.request.use(async (config) => {
+  if (config.method === "get") {
+    config.headers.Authorization = `Bearer ${process.env.VUE_APP_API_KEY}`;
+    return config;
+  }
+
   const auth = getAuth();
   const user = auth.currentUser;
   if (user) {

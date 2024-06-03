@@ -275,13 +275,11 @@ export default {
 
       try {
         if (isEditing.value) {
-          // Update configuration
           await axiosInstance.put(
             `/configs/${newConfig.value.id}`,
             newConfig.value
           );
         } else {
-          // Add new configuration
           await axiosInstance.post("/configs", newConfig.value);
         }
 
