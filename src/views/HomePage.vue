@@ -24,16 +24,20 @@
         <table class="config-table">
           <thead>
             <tr>
-              <th>Parameter Key</th>
-              <th>Value</th>
-              <th>Description</th>
-              <th @click="sortConfigs('createDate')" class="sortable">
+              <th style="width: 20%">Parameter Key</th>
+              <th style="width: 15%">Value</th>
+              <th style="width: 25%">Description</th>
+              <th
+                @click="sortConfigs('createDate')"
+                class="sortable"
+                style="width: 15%"
+              >
                 Create Date
                 <span
                   :class="sortOrder === 'asc' ? 'arrow-up' : 'arrow-down'"
                 ></span>
               </th>
-              <th v-if="!selectedCountry">Actions</th>
+              <th style="width: 25%" v-if="!selectedCountry">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -47,7 +51,11 @@
               <td>{{ config.createDate }}</td>
               <td v-if="!selectedCountry">
                 <button @click="startEdit(config)" class="edit-button">
-                  Edit
+                  {{
+                    isEditing && newConfig.id === config.id
+                      ? "Cancel Edit"
+                      : "Edit"
+                  }}
                 </button>
                 <button @click="deleteConfig(config.id)" class="delete-button">
                   Delete
@@ -74,7 +82,13 @@
           <p><strong>Description:</strong> {{ config.description }}</p>
           <p><strong>Create Date:</strong> {{ config.createDate }}</p>
           <div class="button-group" v-if="!selectedCountry">
-            <button @click="startEdit(config)" class="edit-button">Edit</button>
+            <button @click="startEdit(config)" class="edit-button">
+              {{
+                isEditing && newConfig.value.id === config.id
+                  ? "Cancel Edit"
+                  : "Edit"
+              }}
+            </button>
             <button @click="deleteConfig(config.id)" class="delete-button">
               Del
             </button>
@@ -97,20 +111,28 @@
           v-model="newConfig.key"
           placeholder="New Parameter"
           required
+          style="width: 17%"
         />
         <input
           type="text"
           v-model="newConfig.value"
           placeholder="Value"
           required
+          style="width: 12%"
         />
         <input
           type="text"
           v-model="newConfig.description"
           placeholder="New Description"
           required
+          style="width: 36%"
         />
-        <button type="submit">{{ isEditing ? "Update" : "ADD" }}</button>
+
+        <div class="add-config-action">
+          <button class="edit-button" type="submit">
+            {{ isEditing ? "Update" : "ADD" }}
+          </button>
+        </div>
       </form>
       <div v-if="showCountryConfigModal" class="modal">
         <div class="modal-content">
@@ -313,8 +335,19 @@ export default {
     };
 
     const startEdit = (config) => {
-      newConfig.value = { ...config };
-      isEditing.value = true;
+      if (isEditing.value && newConfig.value.id === config.id) {
+        isEditing.value = false;
+        newConfig.value = {
+          id: "",
+          key: "",
+          value: "",
+          description: "",
+          version: 0,
+        };
+      } else {
+        newConfig.value = { ...config };
+        isEditing.value = true;
+      }
     };
 
     const openCountryConfigModal = (config) => {
@@ -450,7 +483,7 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #1c1c1c;
+  background-color: #01092a;
   color: #fff;
 }
 
@@ -459,7 +492,6 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  background-color: #2c2c2c;
 }
 
 .logo {
@@ -483,8 +515,8 @@ header {
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: #333;
-  border: 1px solid #444;
+  background-color: #ffffff;
+  border: 1px solid #01092a;
   padding: 10px;
   border-radius: 5px;
 }
@@ -494,15 +526,13 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 36px;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 .table-container {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
 }
 
 .config-table {
@@ -513,16 +543,18 @@ main {
 .config-table th,
 .config-table td {
   padding: 10px;
-  border: 1px solid #444;
+  border: none;
   text-align: left;
 }
 
 .config-table th {
-  background-color: #333;
+  background-color: #01092a;
+  color: #a7b1d7;
+  font-size: larger;
 }
 
 .config-table td {
-  background-color: #2c2c2c;
+  background-color: #01092a;
 }
 
 button {
@@ -543,28 +575,38 @@ button {
   color: #fff;
 }
 
+.country-config-button {
+  background-color: #6c757d;
+  color: #fff;
+}
+
 .add-config-form {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  padding: 20px;
-  gap: 10px;
+  padding-top: 20px;
+  gap: 2%;
+  width: 100%;
 }
 
 .add-config-form input {
   padding: 10px;
   border-radius: 5px;
-  border: none;
-  width: 200px;
+  border: 1px solid #8791b7;
+  background-color: #01092a;
+  color: #fff;
 }
 
 .add-config-form button {
-  padding: 10px 20px;
-  border-radius: 5px;
-  border: none;
+  padding: 5px 10px;
   background-color: #28a745;
   color: #fff;
   cursor: pointer;
+}
+
+.add-config-action {
+  width: 20%;
+  display: flex;
 }
 
 .sortable {
@@ -640,7 +682,8 @@ button {
   }
 
   .config-item {
-    background-color: #2c2c2c;
+    border: 1px solid white;
+    border-radius: 16px;
     padding: 15px;
     margin-bottom: 10px;
     border-radius: 5px;
@@ -672,7 +715,7 @@ button {
   }
 
   .add-config-form input {
-    width: 90%;
+    width: 90% !important;
     margin-bottom: 10px;
   }
 }
